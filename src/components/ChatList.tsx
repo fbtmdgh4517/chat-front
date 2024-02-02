@@ -51,13 +51,17 @@ export const ChatList = () => {
 
     const sendMsg = () => {
       console.log(inputMsg);
-      const destination = `/publish/chat/${selectedUser.memberNum}`;
-      publishMsg(destination, {
+      const msg = {
         cmiMessage: inputMsg,
         cmiSenderUiNum: loginUser.memberNum,
         cmiReceiveUiNum: selectedUser.memberNum
-      });
+      };
+      const destination = `/publish/chat/${selectedUser.memberNum}`;
+
+      publishMsg(destination, msg);
+
       setInputMsg('');
+      getChatList();
     }
 
     useEffect(() => {
