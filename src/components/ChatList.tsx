@@ -16,6 +16,7 @@ import { useChatSelector } from "../store";
 import axios from "axios";
 import { axiosAuth } from "../api/axiosHttp";
 import { Msg } from "../types/Msg.type";
+import { publishMsg } from "../service/ChatService";
 
 export const ChatList = () => {
     const [inputMsg, setInputMsg] = useState<string>('');
@@ -46,6 +47,17 @@ export const ChatList = () => {
       if(d1Str!==d2Str){
         return <MessageSeparator content={`${d2Str} (${days[d2.getDay()]})`}/>
       }
+    }
+
+    const sendMsg = () => {
+      console.log(inputMsg);
+      const destination = `/publish/chat/${selectedUser.memberNum}`;
+      publishMsg(destination, {
+        cmiMessage: inputMsg,
+        cmiSenderUiNum: loginUser.memberNum,
+        cmiReceiveUiNum: selectedUser.memberNum
+      });
+      setInputMsg('');
     }
 
     useEffect(() => {
@@ -97,7 +109,8 @@ export const ChatList = () => {
               placeholder="Type message here"
               value={inputMsg}
               onChange={(val) => setInputMsg(val)}
-              onSend={() => setInputMsg("")}
+              onSend={sendMsg}
+              sendDisabled={false}
             />
           </ChatContainer>
     )
