@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <input type="text" id="d1" value="2024-02-02 07:00:01"><br>
+    <input type="text" id="d2"><br>
+    <button onclick="calcDate()">계산</button>
+    <script>
+        const days = ['일', '월', '화', '수', '목', '금', '토'];
+
+        function calcDate() {
+            const d1 = new Date(document.querySelector('#d1').value);
+            const d2 = new Date(document.querySelector('#d2').value);
+            console.log(d1);
+            console.log(d2);
+            const month = d1.getMonth() < 9 ? '0' + (d1.getMonth() + 1) : d1.getMonth() + 1;
+            const date = d1.getDate() < 9 ? '0' + (d1.getDate()) : d1.getDate();
+            const str = `${d1.getFullYear()}-${month}-${date}(${days[d1.getDay()]})`;
+            console.log(str);
+        }
+    </script>
+</body>
+</html>
