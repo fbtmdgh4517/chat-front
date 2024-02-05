@@ -35,6 +35,7 @@ export const UserList = () => {
                         onClick={() => {
                             dispatch(setSelectedUser(chatUser))
                         }}
+                        unreadCnt={chatUser.unreadCnt}
                     >
                         <Avatar
                             src={require("./images/profile.png")}
@@ -43,44 +44,6 @@ export const UserList = () => {
                         />
                     </Conversation>
                 )): ''}
-
-                <Conversation
-                    name="Joe"
-                    lastSenderName="Joe"
-                    info="Yes i can do it for you"
-                >
-                    <Avatar
-                    src={require("./images/profile.png")}
-                    name="Joe"
-                    status="dnd"
-                    />
-                </Conversation>
-
-                <Conversation
-                    name="Emily"
-                    lastSenderName="Emily"
-                    info="Yes i can do it for you"
-                    unreadCnt={3}
-                >
-                    <Avatar
-                    src={require("./images/profile.png")}
-                    name="Emily"
-                    status="available"
-                    />
-                </Conversation>
-
-                <Conversation
-                    name="Kai"
-                    lastSenderName="Kai"
-                    info="Yes i can do it for you"
-                    unreadDot
-                >
-                    <Avatar
-                    src={require("./images/profile.png")}
-                    name="Kai"
-                    status="unavailable"
-                    />
-                </Conversation>
             </ConversationList>
           </Sidebar>
     );

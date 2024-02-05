@@ -16,4 +16,5 @@ export interface User {
 	loginDate?:string;
 	token?:string;
 	authorities?:any[];
+	unreadCnt?:number;
 }

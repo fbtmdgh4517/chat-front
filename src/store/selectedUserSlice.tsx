@@ -37,6 +37,7 @@ const selectedUserSlice = createSlice({
             state.loginDate = action.payload.loginDate;
             state.token = action.payload.token;
             state.authorities = action.payload.authorities;
+            localStorage.setItem('selectedUser', JSON.stringify(action.payload));
         },
         initUser: (state:User) => {
             state = initialState

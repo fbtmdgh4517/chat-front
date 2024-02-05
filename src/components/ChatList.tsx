@@ -11,12 +11,13 @@ import {
     TypingIndicator,
     MessageList
   } from "@chatscope/chat-ui-kit-react";
-import { useEffect, useRef, useState } from "react";
-import { useChatSelector } from "../store";
+import { Fragment, useEffect, useRef, useState } from "react";
+import { useChatDispatch, useChatSelector } from "../store";
 import axios from "axios";
 import { axiosAuth } from "../api/axiosHttp";
 import { Msg } from "../types/Msg.type";
 import { publishMsg } from "../service/ChatService";
+import { setChatList } from "../store/chatListSlice";
 
 export const ChatList = () => {
     const [inputMsg, setInputMsg] = useState<string>('');
@@ -24,10 +25,35 @@ export const ChatList = () => {
     const loginUser = useChatSelector((state:any) => state.user);
     const [msgs, setMsgs] = useState<Msg[]>([]);
     const page = useRef<number>(1);
+    
+    const chatList = useChatSelector((state:any) => state.chatList);
+    const dispatch = useChatDispatch();
 
-    const getChatList = async () => {
-      const res = await axiosAuth.get(`/chat-list/${page.current}?cmiSenderUiNum=${selectedUser.memberNum}&cmiReceiveUiNum=${loginUser.memberNum}`);
-      setMsgs(res.data.list.reverse());
+    const getChatList = async (init:boolean) => {
+      try {
+        const res = await axiosAuth.get(`/chat-list/${page.current}?cmiSenderUiNum=${selectedUser.memberNum}&cmiReceiveUiNum=${loginUser.memberNum}`);
+        const tmpMsgs = res.data.list;
+        tmpMsgs.sort((m1:any,m2:any)=>{
+          return m1.cmiSentTime.localeCompare(m2.cmiSentTime);
+        });
+        if(init){
+          const chatInfo:any = {
+            memberNum : selectedUser.memberNum,
+            list: tmpMsgs
+          }
+          dispatch(setChatList(chatInfo));
+        }else{
+          // setMsgs([...tmpMsgs,msgs]);
+          console.log('tmpMsgs=>', tmpMsgs);
+          const chatInfo:any = {
+            memberNum : selectedUser.memberNum,
+            list: tmpMsgs
+          }
+          dispatch(setChatList(chatInfo));
+        }
+      } catch(e) {
+        console.log(e)
+      }
     }
 
     const getFormat = (n:number) => {
@@ -36,6 +62,8 @@ export const ChatList = () => {
 
     const days = ['일', '월','화','수','목','금','토']
     const printMessageSeparator = (date1?:any, date2?:any)=>{
+      // console.log(date1);
+      // console.log(date2);
       const d2 = new Date(date2);
       const d2Str = `${d2.getFullYear()}-${getFormat(d2.getMonth()+1)}-${getFormat(d2.getDate())}`;
       if(!date1){
@@ -61,12 +89,12 @@ export const ChatList = () => {
       publishMsg(destination, msg);
 
       setInputMsg('');
-      getChatList();
+      getChatList(false);
     }
 
     useEffect(() => {
       page.current = 1;
-      getChatList();
+      getChatList(true);
     }, [selectedUser]);
 
     return (
@@ -88,9 +116,9 @@ export const ChatList = () => {
             <MessageList typingIndicator={<TypingIndicator content="Zoe is typing" />}>
 
               {
-                msgs.map((msg, idx) => (
-                  <>
-                    {printMessageSeparator(idx===0 ? null : msgs[idx-1].cmiSentTime, msg.cmiSentTime)}
+                selectedUser.memberNum !== 0 && chatList.list.map((msg:Msg, idx:number) => (
+                  <Fragment key={idx}>
+                    {printMessageSeparator(idx===0 ? null : chatList.list[idx-1].cmiSentTime, msg.cmiSentTime)}
                     <Message
                       key={idx}
                       model={{
@@ -103,7 +131,7 @@ export const ChatList = () => {
                     >
                       <Avatar src={require("./images/profile.png")} name="Zoe" />
                     </Message>
-                  </>
+                  </Fragment>
                 ))
               }
 

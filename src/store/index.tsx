@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import storage from "redux-persist/lib/storage";
 import userReducer from "./userSlice";
 import userListReducer from './userListSlice';
+import chatListReducer from './chatListSlice';
 import enterUserReducer from './enterUserSlice';
 import selectedUserReducer from './selectedUserSlice';
 
@@ -11,12 +12,14 @@ const reducers = combineReducers({
     user: userReducer,
     userList: userListReducer,
     enterUser: enterUserReducer,
-    selectedUser: selectedUserReducer
+    selectedUser: selectedUserReducer,
+    chatList: chatListReducer
 });
 
 const persistConfig = {
     key: 'root',
     storage,
+    whitelist:['user', 'userList']
 }
 
 const persistedReducer = persistReducer(persistConfig, reducers);

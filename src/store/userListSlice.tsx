@@ -6,9 +6,13 @@ const userListSlice = createSlice({
     reducers: {
         setUserList: (state:any, action:any) => {
             state.list = action.payload;
+            localStorage.setItem('userList', JSON.stringify(action.payload))
+        },
+        initUserList: (state:any) => {
+            state.list = [];
         }
     }
 });
 
-export const {setUserList} = userListSlice.actions;
+export const {setUserList, initUserList} = userListSlice.actions;
 export default userListSlice.reducer;
