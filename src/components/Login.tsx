@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { User } from '../types/User.type';
 import { useNavigate } from 'react-router-dom';
 import { useChatDispatch } from '../store';
-import { axiosHttp } from '../api/axiosHttp';
+import { axiosAuth, axiosHttp } from '../api/axiosHttp';
 import { setUser } from '../store/userSlice';
+import { setUserList } from '../store/userListSlice';
 
 export const Login = ()=> {
   const [error, setError] = useState<boolean>(false);
@@ -27,12 +28,14 @@ export const Login = ()=> {
   const login = async () => {
     setError(false);
     try {
-      const res = await axiosHttp.post('/api/login', chatUser);
-      localStorage.setItem('token', res.data.jwt);
-      localStorage.setItem('memberNum', res.data.user.memberNum);
+      const loginRes = await axiosHttp.post('/api/login', chatUser);
+      localStorage.setItem('token', loginRes.data.jwt);
+      localStorage.setItem('memberNum', loginRes.data.user.memberNum);
+      const userListRes = await axiosAuth.get(`/chat-member-infos/${loginRes.data.user.memberNum}`);
+      dispatch(setUserList(userListRes.data));
       dispatch(setUser({
-        ...res.data.user,
-        token: res.data.jwt
+        ...loginRes.data.user,
+        token: loginRes.data.jwt
       }));
       navigate('/main');
     } catch (err) {

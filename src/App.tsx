@@ -15,41 +15,37 @@ import { persistor } from '.';
 import { Msg } from './types/Msg.type';
 import { globalRouter } from './api/globalRouter';
 import { setChatList } from './store/chatListSlice';
+import { axiosAuth } from './api/axiosHttp';
 
 
 function App() {
   const navigate = useNavigate();
+  const dispatch = useChatDispatch();
   globalRouter.navigate = navigate;
   const loginUser = useChatSelector((state: any) => state.user);
   const memberNum = localStorage.getItem('memberNum');
   const tmpObj = useChatSelector((state: any) => state.userList);
   const selectedUser = useChatSelector((state:any) => state.selectedUser);
-  const dispatch = useChatDispatch();
   const configs = [
     {
       url: `/topic/enter-chat`,
       callback: (data: any) => {
-        const tmpUsers = JSON.parse(data.body);
-        const loginUsers = tmpObj.list.filter((user: any) => {
-          if(!user.login){
-            for(const tmpUser of tmpUsers){
-              if(tmpUser.login && tmpUser.memberNum === user.memberNum){
-                console.log(tmpUser);
-                return user;
-              }
+        const connectedUsers = JSON.parse(data.body);
+        const users = JSON.parse(localStorage.getItem('userList') || '[]');
+        users.map((user:any) => {
+          for(const key in connectedUsers) {
+            const connectedUser = connectedUsers[key];
+            if(user.memberNum === connectedUser.memberNum) {
+              user.login = connectedUser.login;
             }
           }
-        });
-
-        for(const loginUser of loginUsers){
-          dispatch(setEnterUser(loginUser));
-        }
-        dispatch(setUserList(tmpUsers));
+        })
+        dispatch(setUserList(users));
       }
     },
     {
       url: `/topic/chat/${loginUser.memberNum}`,
-      callback: (data: any) => {
+      callback: async (data: any) => {
         const msg:Msg = JSON.parse(data.body);
         const tmpList:any = JSON.parse(localStorage.getItem('userList') || '[]');
         const selectedUser:any = JSON.parse(localStorage.getItem('selectedUser') || '{}');
@@ -69,19 +65,26 @@ function App() {
           const chatList:any = JSON.parse(localStorage.getItem('chatList') || '[]');
           chatList.list.push(msg);
           dispatch(setChatList(chatList));
+          const res = await axiosAuth.put('/message-log', {
+            cmiSenderUiNum: msg.cmiSenderUiNum,
+            cmiReceiveUiNum: memberNum
+          })
         }
       }
     }]
   useEffect(() => {
     disconnectClient();
-    if (!memberNum) {
+    if (loginUser.memberNum === 0) {
       persistor.purge();
+      navigate('/');
       return;
     }
-    initClient(configs)
-    .catch(e=>{
-      console.log(e);
-    });
+    setTimeout(async () => {
+      await initClient(configs)
+      .catch(e => {
+        console.log(e);
+      })
+    }, 200);
   }, [loginUser]);
 
   return (
@@ -91,7 +94,7 @@ function App() {
       <div className="App">
         <nav className="navbar navbar-expand-lg navbar-light fixed-top">
           <div className="container">
-            <Link className="navbar-brand" to={loginUser.memberNum===0?'/sign-in':'/main'}>
+            <Link className="navbar-brand" to={loginUser.memberNum===0 ? '/sign-in':'/main'}>
               Chatting
             </Link>
             

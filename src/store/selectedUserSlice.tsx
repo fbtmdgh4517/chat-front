@@ -19,7 +19,8 @@ const initialState:User = {
 	sessionId: '',
 	loginDate: '',
     token: '',
-    authorities: []
+    authorities: [],
+    unreadCnt: 0
 };
 
 const selectedUserSlice = createSlice({
@@ -34,9 +35,11 @@ const selectedUserSlice = createSlice({
             state.memberEmail = action.payload.memberEmail;
             state.memberPhone = action.payload.memberPhone;
             state.memberRole = action.payload.memberRole;
+            state.memberImgPath = action.payload.memberImgPath;
             state.loginDate = action.payload.loginDate;
             state.token = action.payload.token;
             state.authorities = action.payload.authorities;
+            state.unreadCnt = action.payload.unreadCnt;
             localStorage.setItem('selectedUser', JSON.stringify(action.payload));
         },
         initUser: (state:User) => {

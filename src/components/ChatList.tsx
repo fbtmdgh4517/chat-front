@@ -30,6 +30,7 @@ export const ChatList = () => {
     const dispatch = useChatDispatch();
 
     const getChatList = async (init:boolean) => {
+      if(!selectedUser.memberNum) return;
       try {
         const res = await axiosAuth.get(`/chat-list/${page.current}?cmiSenderUiNum=${selectedUser.memberNum}&cmiReceiveUiNum=${loginUser.memberNum}`);
         const tmpMsgs = res.data.list;
@@ -95,13 +96,17 @@ export const ChatList = () => {
     useEffect(() => {
       page.current = 1;
       getChatList(true);
+      console.log('selectedUser=>', selectedUser);
+      console.log('loginUser=>', loginUser);
     }, [selectedUser]);
 
     return (
         <ChatContainer>
             <ConversationHeader>
               <ConversationHeader.Back />
-              <Avatar src={require("./images/profile.png")} name="Zoe" />
+              <Avatar 
+                src={selectedUser.memberImgPath ? `${selectedUser.memberImgPath}` : require("./images/profile.png")} 
+                name="Zoe" />
               <ConversationHeader.Content
                 userName={selectedUser.memberName}
                 info={selectedUser.loginDate}
@@ -129,7 +134,13 @@ export const ChatList = () => {
                         position: "single"
                       }}
                     >
-                      <Avatar src={require("./images/profile.png")} name="Zoe" />
+                      <Avatar src={
+                        msg.cmiReceiveUiNum === loginUser.memberNum && selectedUser.memberImgPath ?
+                        `${selectedUser.memberImgPath}`
+                        : msg.cmiSenderUiNum === loginUser.memberNum && loginUser.memberImgPath ? 
+                        `${loginUser.memberImgPath}` 
+                        : 
+                        require("./images/profile.png")} name="Zoe" />
                     </Message>
                   </Fragment>
                 ))

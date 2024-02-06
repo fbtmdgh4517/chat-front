@@ -7,7 +7,9 @@ const client = new Client({
     brokerURL: brokerURL,
     debug: (str) => {
         console.log(str);
-    }
+    },
+    reconnectDelay:1000,
+    connectionTimeout:100
 });
 
 export const initClient = async (configs:any[]) => {

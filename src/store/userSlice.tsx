@@ -34,6 +34,7 @@ const userSlice = createSlice({
             state.memberEmail = action.payload.memberEmail;
             state.memberPhone = action.payload.memberPhone;
             state.memberRole = action.payload.memberRole;
+            state.memberImgPath = action.payload.memberImgPath;
             state.token = action.payload.token;
             state.authorities = action.payload.authorities;
         },
